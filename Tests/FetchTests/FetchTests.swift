@@ -1,6 +1,11 @@
 import Testing
 @testable import Fetch
 
+import Foundation
+
 @Test func example() async throws {
-    // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+    let weather: Weather? = try? await URLSession.shared.get(from: Weather.Routes.get(city: "London"))
+    
+    dump(weather)
+    #expect(weather != nil)
 }
