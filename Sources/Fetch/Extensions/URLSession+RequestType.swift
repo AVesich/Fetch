@@ -10,10 +10,16 @@ import Foundation
 @available(macOS 12.0, *)
 @available(iOS 15.0, *)
 extension URLSession {
-    public func post<T: Fetchable>(_ value: T, to route: any FetchableRoute) async throws {
+    public func post<T: Fetchable, R: Codable>(_ value: T, to route: any FetchableRoute) async throws -> R? {
         var request = URLRequest.post(route.rawValue)
         request.httpBody = value.data
-        _ = try await URLSession.shared.upload(for: request, from: value.data)
+        let (resultData, _) = try await URLSession.shared.upload(for: request, from: value.data)
+        
+        if let resultObject = try? JSONDecoder().decode(R.self, from: resultData) {
+            return resultObject
+        } else {
+            return nil
+        }
     }
         
     public func get<T: Fetchable>(from route: any FetchableRoute) async throws -> T? {
